@@ -1,0 +1,9 @@
+# These cycle counts were obtained on the PTARM Simulator v1.0, obtained from
+# http://chess.eecs.berkeley.edu/pret/src/ptarm-1.0/ptarm_simulator.html.
+# The basis paths were generated with Boolector as the backend SMT solver
+# (with Lingeling as its SAT solver) and the default solver of the PuLP
+# package (v1.5.3) as the backend integer linear programming solver.
+
+1   283
+2   299
+3   273

@@ -1,0 +1,50 @@
+include aclocal.m4
+include configure
+include configure.ac
+include ez_setup.py
+include install-sh
+include LICENSE
+include Makefile.am
+include Makefile.in
+include missing
+include README
+include setup.py.in
+include verify-installation
+
+include src/*.py
+include src/cli/*.py
+include src/gui/*.png
+include src/gui/*.py
+include src/simulators/*.py
+include src/smt/*.py
+
+include src/config.xml.in
+include src/bin/*.dll
+include src/bin/*.in
+include src/bin/analyzeProject.py
+include src/bin/sampleProjectConfig.xml
+
+include src/cil/LICENSE
+include src/cil/bin/cilly
+include src/cil/bin/cilly.bat.in
+include src/cil/bin/cilly.byte
+include src/cil/bin/cilly.native
+include src/cil/lib/perl5/patcher
+include src/cil/lib/perl5/App/Cilly.pm
+include src/cil/lib/perl5/App/Cilly/*.pm
+include src/ocaml/conf/findlib.conf
+include src/ocaml/lib/cil/*.cma
+include src/ocaml/lib/cil/*.cmxs
+include src/ocaml/lib/cil/META
+include src/ocaml/lib/loopHandler/loopHandler.cma
+include src/ocaml/lib/loopHandler/loopHandler.cmxs
+include src/ocaml/lib/loopHandler/META
+
+include ext/*
+
+recursive-include demo/sandbox/modexp *
+recursive-include demo/sandbox/modexp_unrolled *
+recursive-include demo/sandbox/speed *
+recursive-include demo/gui/modexp *
+recursive-include demo/gui/modexp_unrolled *
+recursive-include demo/gui/speed *

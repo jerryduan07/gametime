@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Prepares the GameTime graphical user interface and shows the main window.
+
+# See the LICENSE file, located in the root directory of
+# the source distribution and
+# at http://verifun.eecs.berkeley.edu/gametime/about/LICENSE,
+# for details on the GameTime license and authors.
+
+
+GUI_SCRIPT=`cygpath -m /cygdrive/c/Python27/Lib/site-packages/gametime-1.5-py2.7.egg/gametime/gui/gui.py`
+python $GUI_SCRIPT $@

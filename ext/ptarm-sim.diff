@@ -1,0 +1,11 @@
+--- WritebackStage.cpp
++++ WritebackStage.cpp
+@@ -97,7 +97,7 @@
+     }
+ 
+     state->virtualCycleCount++;
+-    LOGWB(logDBG3) << "Thread virtual cycle count: " << state->virtualCycleCount;
++    LOGWB(logDBG1) << "Thread virtual cycle count: " << state->virtualCycleCount;
+ }
+ 
+ void WritebackStage::reset() {

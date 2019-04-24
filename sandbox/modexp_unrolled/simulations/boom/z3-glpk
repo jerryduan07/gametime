@@ -1,0 +1,24 @@
+# These cycle counts were obtained on the PTARM Simulator v1.0, obtained from
+# http://chess.eecs.berkeley.edu/pret/src/ptarm-1.0/ptarm_simulator.html.
+# The basis paths were generated with Z3 v4.3.0 as the backend SMT solver and
+# the GLPK package v1.5.3 as the backend integer linear programming solver.
+
+# Basis path 1:
+# exponent = 0x3;
+2   504
+
+# Basis path 2:
+# exponent = 0x4;
+1   499
+
+# Basis path 3:
+# exponent = 0x8;
+5   537
+
+# Basis path 4:
+# exponent = 0xd;
+3   612
+
+# Basis path 5:
+# exponent = 0xe;
+4   648

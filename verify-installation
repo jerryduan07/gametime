@@ -1,0 +1,4 @@
+#!/bin/sh
+python ./src/bin/analyzeProject.py $@
+find ./demo -name "*-gt" -type d | xargs rm -rf
+find ./demo -name "*.pyc" -type d | xargs rm -rf

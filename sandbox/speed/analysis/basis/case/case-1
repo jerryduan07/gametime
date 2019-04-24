@@ -1,0 +1,3 @@
+acc = 0x28;
+initial_speed = 0x80005005;
+time = 0x4150;

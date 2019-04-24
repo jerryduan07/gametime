@@ -1,0 +1,12 @@
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\Utilities.dll
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\Utilities.pdb
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\phxd.dll
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\phxd.pdb
+C:\Research\GameTime-v1\src\phoenix\Utilities\obj\x86\Debug\Utilities.dll
+C:\Research\GameTime-v1\src\phoenix\Utilities\obj\x86\Debug\Utilities.pdb
+C:\Users\545S\Documents\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\Utilities.dll
+C:\Users\545S\Documents\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\Utilities.pdb
+C:\Users\545S\Documents\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\phxd.dll
+C:\Users\545S\Documents\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\phxd.pdb
+C:\Users\545S\Documents\Research\GameTime-v1\src\phoenix\Utilities\obj\x86\Debug\Utilities.dll
+C:\Users\545S\Documents\Research\GameTime-v1\src\phoenix\Utilities\obj\x86\Debug\Utilities.pdb

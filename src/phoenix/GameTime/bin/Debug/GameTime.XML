@@ -1,0 +1,1754 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GameTime</name>
+    </assembly>
+    <members>
+        <member name="T:GameTime.Path">
+            <summary>
+            This class describes a path in the flow graph of
+            a Phoenix function unit.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.sourceBlock">
+            <summary>
+            Source basic block (the first basic block) of the path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.sinkBlock">
+            <summary>
+            Sink basic block (the last basic block) of the path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.functionUnit">
+            <summary>
+            Function unit that contains the basic blocks of the path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.config">
+            <summary>
+            Object that maintains configuration information about GameTime.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.projectConfig">
+            <summary>
+            Object that maintains information about the current GameTime project.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.blocks">
+            <summary>
+            List of basic blocks (of the flow graph of the function unit) that lie along the path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.blockSuccessors">
+            <summary>
+            Dictionary that maps the ID of a basic block to the ID of its successor basic block
+            along the path. This memoization is used to find edges along the path, given the ID
+            of the source basic block.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.conditions">
+            <summary>
+            List of pairs, where the first element is an Expression and the second element
+            is the ID of the basic block that contains the conditional Expression. The Expressions
+            represent the conditions that must be true to traverse this path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.operandExpressions">
+            <summary>
+            Dictionary that maps an operand to its translated Expression. This dictionary
+            memoizes translations, improving code efficiency.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.variables">
+            <summary>
+            Set of variable Expressions that occur in conditions and assignments along the path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.addressTaken">
+            <summary>
+            Dictionary that maps between a variable Expression whose address has been taken
+            (an "address-taken" variable) and the temporary array variable Expression that
+            represents a pointer to the variable Expression.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.arrayVariables">
+            <summary>
+            Set of array variable Expressions that occur in conditions and assignments
+            along the path.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.arrayDimensions">
+            <summary>
+            Dictionary that maps between array variable Expressions and the dimensions of
+            the arrays that they refer to. The "dimension" of an array is a list of
+            bit-sizes that appear in the type of the operand that refers to the array.
+            For example, an array that maps an integer to a character, such as a character array,
+            has the dimensions (32, 8).
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.aliasTable">
+            <summary>
+            Table that maps an Expression to the Expression that it is an alias for. This means
+            that the Expression can be replaced with the Expression that it is an alias for,
+            without changing the result. This is especially helpful when a memory location
+            can be accessed through at least two different names: for example, if "a" and "b"
+            point to the same memory location, then this table will contain the anonymous
+            "dereference function" Expression "(_ (__gtINDEX0) a[__gtINDEX0])" and its alias
+            "(_ (__gtINDEX1) b[__gtINDEX1])", so that any call to the latter can, and will,
+            be replaced by a call to the former.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.aggregateOffsetTable">
+            <summary>
+            Offset table that maps an aggregate (struct or union) Expression to a pair whose
+            first element is a "base aggregate" Expression and whose second element is
+            the Expression for the offset of the start of the aggregate from
+            the "base aggregate" (in bits).
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.arrayAccesses">
+            <summary>
+            List of array accesses that occur in conditions and assignments along the path.
+            An "array access" is a pair that maps an array variable Expression to a list of
+            the numbers of the temporary indices in an array access. For example, the array
+            access Expression "a[__gtINDEX0][__gtINDEX2]" is stored as a pair that maps
+            the array variable Expression for "a" to a list that contains the numbers 0 and 2.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.temporaryIndexExpressions">
+            <summary>
+            Dictionary that maps temporary indices in array access Expressions to
+            the Expressions that these indices replace.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.temporaryVariableCounter">
+            <summary>
+            Counter that keeps track of the number of temporary (non-index) variable Expressions
+            that have already been generated.
+            </summary>
+        </member>
+        <member name="F:GameTime.Path.temporaryIndexCounter">
+             <summary>
+            ounter that keeps track of the number of temporary index variable Expressions
+             that have already been generated.
+             </summary>
+        </member>
+        <member name="F:GameTime.Path.temporaryPointerCounter">
+            <summary>
+            Counter that keeps track of the number of temporary pointer variable Expressions
+            that have already been generated.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.#ctor(System.Collections.Generic.List{Phx.Graphs.BasicBlock},Utilities.Configuration,Utilities.ProjectConfiguration)">
+            <summary>
+            Constructor for the Path class.
+            </summary>
+            
+            <param name="blocks">List of basic blocks (of the flow graph of the function unit)
+            that lie along the path.</param>
+            <param name="config">Configuration object that contains GameTime configuration
+            information.</param>
+            <param name="projectConfig">ProjectConfiguration object that contains project
+            configuration information.</param>
+        </member>
+        <member name="M:GameTime.Path.IsLocatedAfter(Phx.Graphs.BasicBlock,Phx.Graphs.BasicBlock)">
+            <summary>
+            Determines if <paramref name="block"/> is present after
+            <paramref name="otherBlock"/> on this Path.
+            </summary>
+            
+            <param name="block">Block to check for.</param>
+            <param name="otherBlock">Block to check against.</param>
+            <returns>True if <paramref name="block"/> is located before
+            <paramref name="otherBlock"/> on this Path, false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.Path.IdentifyEdge(System.Int32)">
+            <summary>
+            Identifies the edge that corresponds to the input conditional Expression
+            along this path.
+            </summary>
+            
+            <param name="conditionIndex">Index of the conditional Expression in the list of
+            conditional Expressions maintained by this path.</param>
+            <returns>Pair of the IDs of the basic blocks incident to the edge that corresponds
+            to the input conditional Expression.</returns>
+        </member>
+        <member name="M:GameTime.Path.InitializeBasicBlockAddenda">
+            <summary>
+            Initializes the BasicBlockAddendum for each of the basic blocks along this path.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.GenerateConditionsAndAssignments">
+            <summary>
+            Generates the conditions and assignments that must be true to traverse this path.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.GenerateAndLogAssignment(Utilities.Expression,Utilities.Expression,Phx.Graphs.BasicBlock)">
+            <summary>
+            Logs the assignment in the addendum of the basic block where it was made. If
+            the expression that is assigned to refers to a pointer variable, then
+            the assignment is also logged in the offset table. This function also generates
+            the conditional Expressions that correspond to the assignment.
+            </summary>
+            
+            <param name="destExpr">Expression that represents the destination of
+            the assignment.</param>
+            <param name="sourceExpr">Expression that represents the source of
+            the assignment.</param>
+            <param name="basicBlock">Basic block that contains the assignment.</param>
+            <returns>List of conditional Expressions that correspond to the assignment.</returns>
+        </member>
+        <member name="M:GameTime.Path.GenerateArrayAssignment(Utilities.Expression,Utilities.Expression,GameTime.Path)">
+            <summary>
+            Private method for <see cref="M:GameTime.Path.GenerateAndLogAssignment(Utilities.Expression,Utilities.Expression,Phx.Graphs.BasicBlock)"/> that constructs
+            an array storage Expression that assigns another Expression
+            to an element of an array.
+            </summary>
+            
+            <param name="destExpr">Expression that represents the destination of
+            the assignment.</param>
+            <param name="sourceExpr">Expression that represents the source of
+            the assignment.</param>
+            <param name="path">Path that contains the two Expressions.</param>
+            <returns>Array storage Expression that assigns another Expression
+            to an element of an array.</returns>
+            <remarks>Precondition: The destination of the assignment is
+            an element of an array.</remarks>
+        </member>
+        <member name="M:GameTime.Path.AddCondition(Utilities.Expression,System.UInt32)">
+            <summary>
+            Adds a new conditional Expression to the list of conditional Expressions that
+            must be true to traverse this path.
+            </summary>
+            
+            <param name="condition">New conditional Expression.</param>
+            <param name="basicBlockId">ID of the basic block that contains the new conditional
+            Expression.</param>
+        </member>
+        <member name="M:GameTime.Path.ReplaceIndices">
+            <summary>
+            Finds the array accesses in the conditions and the assignments along this path,
+            and replaces the index Expressions with temporary variable Expressions. This is
+            useful when the model that results from a satisfiable query is parsed, so that
+            the parser will not have to deal with evaluating arbitrarily complicated expressions.
+            Extra conditions are also added to establish equality between the original indices
+            and these temporary indices.
+            
+            <remarks>This function has a side-effect: the array accesses are logged in
+            the instance variable <see cref="P:GameTime.Path.ArrayAccesses"/>.
+            </remarks>
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.AddNotEqualToZeroConditions">
+            <summary>
+            Adds the conditional Expressions that use the conditional Expressions along this path
+            to ensure that the divisor of a division Expression, or that the modulus of a remainder
+            Expression, is not set to zero by the SMT solver.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.GetNewTemporaryVariable(System.UInt32)">
+            <summary>
+            Returns a new temporary variable Expression with the input bit-size.
+            </summary>
+            
+            <param name="bitSize">Bit-size of the new temporary variable Expression.</param>
+            <returns>New temporary variable Expression with the input bit-size.</returns>
+        </member>
+        <member name="M:GameTime.Path.AddVariable(Utilities.Expression)">
+            <summary>
+            Adds the input variable Expression to the appropriate list of variable Expressions
+            of the path: if the input Expression is a variable Expression, it is added to
+            the list of variable Expressions; if the input Expression is an array variable
+            Expression, it is added to the list of array variable Expressions. The addition only
+            happens if the Expression is not already in its destination list.
+            </summary>
+            <param name="variable">Variable Expression to add.</param>
+        </member>
+        <member name="M:GameTime.Path.AddArrayDimensions(Utilities.Expression,System.Collections.Generic.List{System.UInt32})">
+            <summary>
+            Adds the dimensions of the array that the input array variable Expression refers to
+            into a dictionary that maps array variable Expressions to their dimensions, but only
+            if the mapping does not already exist.
+            </summary>
+            
+            <param name="arrayVarExpr">Array variable Expression.</param>
+            <param name="dimensions">Dimensions of the array that
+            <paramref name="arrayVarExpr"/> refers to.</param>
+        </member>
+        <member name="M:GameTime.Path.GetNewTemporaryIndex(System.UInt32)">
+            <summary>
+            Returns a new temporary index variable Expression that will replace the index
+            in an existing array access.
+            </summary>
+            
+            <param name="bitSize">Bit-size of the new variable Expression.</param>
+            <returns>New temporary index variable Expression with the input bit-size.</returns>
+        </member>
+        <member name="M:GameTime.Path.GetNewTemporaryPointer(Phx.Types.Type)">
+            <summary>
+            Returns a new temporary pointer variable Expression.
+            </summary>
+            
+            <param name="pointerType">Type of the pointer.</param>
+            <returns>New temporary pointer variable Expression.</returns>
+        </member>
+        <member name="M:GameTime.Path.AddArrayAccesses(System.Collections.Generic.List{Utilities.Pair{Utilities.Expression,System.Collections.Generic.List{System.UInt32}}})">
+            <summary>
+            Adds the input array accesses to the list of array accesses of the path, but only
+            those array accesses that are not already in the list.
+            </summary>
+            
+            <param name="arrayAccesses">Array accesses to be added.</param>
+        </member>
+        <member name="M:GameTime.Path.ConvertArrayAccesses">
+            <summary>
+            Converts array access Expressions in the conditions along this path to
+            the appropriate array selection Expressions.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.AddToAliasTable(Utilities.Expression,Utilities.Expression)">
+            <summary>
+            Adds a new entry to the alias table that maps an Expression to the Expression that it
+            is an alias for. If there is already an entry for the Expression, the entry is updated.
+            </summary>
+            
+            <param name="aliasExpr">Expression to add to the alias table.</param>
+            <param name="expr">Expression that it is an alias for.</param>
+        </member>
+        <member name="M:GameTime.Path.FindAliasedExpression(Utilities.Expression)">
+            <summary>
+            Returns the Expression that the input Expression is an alias for. If the input
+            Expression is not an alias for another Expression, the function returns the input
+            Expression itself.
+            </summary>
+            
+            <param name="aliasExpr">Expression that may be an alias for another Expression.</param>
+            <returns>Expression that the input Expression is an alias for, if any; the input
+            Expression itself, otherwise.</returns>
+        </member>
+        <member name="M:GameTime.Path.AddToAggregateOffsetTable(Utilities.Expression,Utilities.Expression,Utilities.Expression)">
+            <summary>
+            Adds a new entry to the offset table that maps an aggregate (struct or union)
+            to a pair whose first element is a "base aggregate" and whose second element
+            is the bit offset of the start of the aggregate from the "base aggregate".
+            If there is already an entry for the pointer, the entry is updated.
+            </summary>
+            
+            <param name="newAggregate">Aggregate to add to the offset table.</param>
+            <param name="baseAggregate">"Base aggregate" that the start of
+            <paramref name="newAggregate"/> is offset from.</param>
+            <param name="bitOffsetExpr">Offset of the start of <paramref name="newAggregate"/>
+            from <paramref name="baseAggregate"/> (in bits).</param>
+        </member>
+        <member name="M:GameTime.Path.FindAggregateBaseAndOffset(Utilities.Expression)">
+            <summary>
+            Returns a Pair whose first element is the "base aggregate" that the start of
+            the input aggregate is offset from, and whose second element is the bit offset.
+            </summary>
+            
+            <param name="aggregate">Aggregate whose "base aggregate" and offset
+            is to be returned.</param>
+            <returns>Pair as described.</returns>
+        </member>
+        <member name="M:GameTime.Path.DumpLineNumbers">
+            <summary>
+            Dump the line numbers of the source-level statements along this path to a file
+            in the temporary GameTime directory.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.DumpConditionEdges(System.Func{System.UInt32,System.UInt32},System.Func{System.UInt32,System.UInt32})">
+            <summary>
+            Dump the edges that correspond to the conditions and assignments along this path
+            to a file in the temporary GameTime directory.
+            
+            <param name="sourceAdjuster">Function that maps the ID of a basic block to
+            the "adjusted" ID of a node in the directed acyclic graph of the function unit.
+            This function is used for basic blocks that are sources of edges.</param>
+            <param name="sinkAdjuster">Function that maps the ID of a basic block to
+            the "adjusted" ID of a node in the directed acyclic graph of the function unit.
+            This function is used for basic blocks that are sinks of edges.</param>
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.DumpConditionTruths">
+            <summary>
+            Dump the line numbers and truth values of the first lines for each basic block
+            along this path to a file in the temporary directory created by GameTime.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.DumpAccesses">
+            <summary>
+            Dump the information about all the array and aggregate accesses made in the conditions
+            and the assignments along this path to files in the temporary directory
+            created by GameTime.
+            </summary>
+        </member>
+        <member name="M:GameTime.Path.ToString">
+            <summary>
+            Returns the string representation of this path, which contains information such
+            as the conditions and the array variables along this path.
+            </summary>
+            
+            <returns>String representation of this path, which contains information such as
+            the conditions and the array variables along this path.</returns>
+        </member>
+        <member name="M:GameTime.Path.Dump">
+            <summary>
+            Dumps the path information to standard output.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.SourceBlock">
+            <summary>
+            Gets the source basic block (the first basic block) of the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.SinkBlock">
+            <summary>
+            Gets the sink basic block (the last basic block) of the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.FunctionUnit">
+            <summary>
+            Gets the function unit that contains the basic blocks of this path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.Config">
+            <summary>
+            Gets the object that maintains configuration information about GameTime.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.ProjectConfig">
+            <summary>
+            Gets the object that maintains information about the current GameTime project.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.Blocks">
+            <summary>
+            Gets or sets the list of basic blocks (of the flow graph of the function unit)
+            that lie along the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.BlockSuccessors">
+            <summary>
+            Gets the dictionary that maps the ID of a basic block to the ID of its successor
+            basic block along the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.Conditions">
+            <summary>
+            Gets the list of pairs, where the first element is an Expression and the second
+            element is the ID of the basic block that contains the conditional Expression.
+            The Expressions represent the conditions that must be true to traverse this path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.OperandExpressions">
+            <summary>
+            Gets the dictionary that maps an operand to its translated Expression.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.Variables">
+            <summary>
+            Gets the set of variable Expressions that occur in conditions and assignments
+            along the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.AddressTaken">
+            <summary>
+            Gets the dictionary that maps between a variable Expression whose address has
+            been taken (an "address-taken" variable) and the temporary array variable Expression
+            that represents a pointer to the variable Expression.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.ArrayVariables">
+            <summary>
+            Gets the set of array variable Expressions that occur in conditions and assignments
+            along the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.ArrayDimensions">
+            <summary>
+            Gets the dictionary that maps between array variable Expressions and the dimensions
+            of the arrays that they refer to.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.AliasTable">
+            <summary>
+            Gets the table that maps an Expression to the Expression that it aliases.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.AggregateOffsetTable">
+            <summary>
+            Gets the offset table that maps an aggregate (struct or union) Expression to
+            a pair whose first element is a "base aggregate" Expression and whose second
+            element is the Expression for the offset of the start of the aggregate from
+            the "base aggregate" (in bits).
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.ArrayAccesses">
+            <summary>  
+            Gets the list of array accesses that occur in conditions and assignments along
+            the path.
+            </summary>
+        </member>
+        <member name="P:GameTime.Path.TemporaryIndexExpressions">
+            <summary>
+            Gets the dictionary that maps temporary indices in array access Expressions
+            to the Expressions that these indices replace.
+            </summary>
+        </member>
+        <member name="T:GameTime.ExpressionHelper">
+            <summary>
+            This class provides various helper functions to extract information from, and modify,
+            an <see cref="T:Utilities.Expression"/> object.
+            </summary>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayVariable(Utilities.Expression)">
+            <summary>
+            Returns the array variable Expression present in the input Expression.
+            </summary>
+            
+            <param name="expr">Expression to extract the array variable Expression from.</param>
+            
+            <returns>Array variable Expression in the input Expression.</returns>
+            <remarks>Precondition: The input Expression is either an array access
+            Expression or an array variable Expression.</remarks>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayDimensions(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Returns the dimensions of the array that the input Expression refers to.
+            </summary>
+            
+            <param name="expr">Expression that refers to an array.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Dimensions of the array that the input Expression refers to.</returns>
+            <remarks>Precondition: The input Expression refers to an array.</remarks>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayAccessIndices(Utilities.Expression,System.Collections.Generic.List{Utilities.Expression},GameTime.Path)">
+            <summary>
+            Returns a list of the index Expressions that are needed to access an element
+            of the array that the input pointer Expression represents. The input list of
+            Expressions represents the (possibly incomplete) list of index Expressions
+            currently available, which may need to be corrected.
+            </summary>
+            
+            <param name="pointerExpr">Pointer Expression that represents an array.</param>
+            <param name="indexExprs">List of the index Expressions currently available.</param>
+            <param name="path">Path that contains the Pointer Expression.</param>
+            <returns>List of index Expressions, as described above.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayElementReference(Utilities.Expression,System.Collections.Generic.List{Utilities.Expression},GameTime.Path)">
+            <summary>
+            Constructs an Expression that refers to a specific element within an array.
+            Dereferencing this Expression should produce an Expression that accesses the element.
+            </summary>
+            
+            <param name="pointerExpr">Pointer Expression that represents an array.</param>
+            <param name="indexExprs">List of index Expressions that access a specific
+            element in the array that the input pointer Expression represents.</param>
+            <param name="path">Path that contains the input pointer Expression.</param>
+            <returns>Expression that refers to a specific element within the array.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayElementsInRange(Utilities.Expression,System.Int32,System.Int32,GameTime.Path)">
+            <summary>
+            Determines the elements of a fixed-size array that are present in a specified
+            range of bits. This method takes in the offset (in bits) of the start of
+            this range from the start of the array, along with the bit-size of this range.
+            It then returns a list of Expressions, each of which represents an element of
+            the provided fixed-size array that is present in the specified range, and each of
+            which is paired with the offset (in bits) of that element from the start of the array.
+            </summary>
+            
+            <param name="arrayExpr">Expression that represents a fixed-size array.</param>
+            <param name="startOffset">Offset (in bits) of the start of a range of bits.</param>
+            <param name="rangeBitSize">Bit-size of the range of bits.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>List of pairs, as described above.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.FindArrayAccesses(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Returns the list of array accesses present in the input Expression, if any.
+            Each element of the list is a pair that maps an array variable Expression to
+            a list of numbers of the temporary index variables.
+            </summary>
+            
+            <param name="expr">Expression that may contain array accesses.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>List of array accesses present in the input Expression as described
+            above, if any.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ConvertArrayAccesses(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Converts the array access Expressions in the input Expression into
+            the appropriate array selection Expressions.
+            </summary>
+            
+            <param name="expr">Expression that may contain array access Expressions.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>New Expression where the array access Expressions in the input Expression
+            are converted into the appropriate array selection Expressions.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.CreateArrayStore(Utilities.Expression,Utilities.Expression,GameTime.Path)">
+            <summary>
+            Creates an Expression that stores the input element in a particular
+            position in an array, as specified by the input Expression.
+            </summary>
+            
+            <param name="expr">Expression that specifies a particular position in an array.</param>
+            <param name="toStore">Element to store.</param>
+            <param name="path">Path that contains the input Expressions.</param>
+            <returns>Expression that stores the input element in a particular position in an array,
+            as specified by the input Expression.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayIndexUpperBound(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Returns the size (in number of array elements) of the array that the input Expression
+            refers to, if the array has a fixed size: the indices of array accesses must be less
+            than this size. If the array does not have a fixed size, a value of -1 is returned.
+            </summary>
+            
+            <param name="expr">Expression that refers to an array.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Size (in number of array elements) of the array that the input Expression
+            refers to, if the array has a fixed size; -1, otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayIndexUpperBound(Phx.Types.Type,GameTime.Path)">
+            <summary>
+            Returns the size (in number of array elements) of the array whose type is provided,
+            if the array has a fixed size: the indices of array accesses must be less than
+            this size. If the array does not have a fixed size, a value of -1 is returned.
+            </summary>
+            
+            <param name="exprType">Type of an Expression that refers to an array.</param>
+            <param name="path">Path that contains the Expression.</param>
+            <returns>Size (in number of array elements) of the array that the input Expression
+            refers to, if the array has a fixed size; -1, otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetArrayIndicesUpperBounds(Phx.Types.Type,GameTime.Path)">
+            <summary>
+            Returns a list of the sizes (in number of array elements) along each dimension of
+            the array whose type is provided: the index of an array access along a dimension
+            must be less than these sizes. If the array does not have a fixed size along
+            a dimension, a value of -1 is added to the list.
+            </summary>
+            
+            <param name="exprType">Type of an Expression that refers to an array.</param>
+            <param name="path">Path that contains the Expression.</param>
+            <returns>List of integers as described.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.AddBoundsOnIndex(Utilities.Expression,Utilities.Expression,System.Int32,GameTime.Path)">
+            <summary>
+            Generates a condition that imposes a lower and upper bound on the input temporary
+            index variable Expression, if the array that is being accessed has a fixed size.
+            If no extra condition is required, null is returned.
+            </summary>
+            
+            <param name="indexExpr">Original index of an array access Expression.</param>
+            <param name="temporaryIndexExpr">Temporary index variable Expression used to replace
+            the original index of an array access Expression.</param>
+            <param name="numElements">Number of elements in the array that is
+            being accessed. If the array does not have a fixed size, this argument
+            should be -1.</param>
+            <param name="path">Path that contains the input Expressions.</param>
+            <returns>Condition that imposes a lower and upper bound on the input temporary index
+            variable Expression, if the array that is being accessed has a fixed size.
+            If no extra condition is required, null is returned.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.AddBoundsOnIndex(Utilities.Expression,System.Int32,GameTime.Path)">
+            <summary>
+            Generates a condition that imposes a lower and upper bound on the input
+            index variable Expression, if the array that is being accessed has a fixed size.
+            If no extra condition is required, null is returned.
+            </summary>
+            
+            <param name="indexExpr">Index of an array access Expression.</param>
+            <param name="numElements">Number of elements in the array that is
+            being accessed. If the array does not have a fixed size, this argument
+            should be -1.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Condition that imposes a lower and upper bound on the input index
+            variable Expression, if the array that is being accessed has a fixed size.
+            If no extra condition is required, null is returned.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ReplaceAndBoundIndex(Utilities.Expression,System.Collections.Generic.List{System.Int32},GameTime.Path)">
+            <summary>
+            Returns a pair whose first element is the Expression that will be used to replace
+            the input Expression, which is the index of an array access, and whose second element
+            is a list of conditions: these comprise equality Expressions between old index
+            Expressions and new temporary index variable Expressions, and any extra conditions on
+            these new temporary index variable Expressions.
+            </summary>
+            
+            <param name="indexExpr">Expression that is the index of an array access.</param>
+            <param name="bounds">List of bounds (in number of elements) on each dimension
+            of the array that is being accessed. If a dimension is not bounded, the list
+            contains the value -1 for this dimension.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Pair as described.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ReplaceIndices(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Replaces the index Expressions in all array access Expressions of the input Expression
+            with temporary index variable Expressions. This method returns a pair whose first
+            element is the new Expression and whose second element is a list of conditions: these
+            comprise equality Expressions between the old index Expressions and the new temporary
+            index variable Expressions, and any extra conditions on the new temporary index
+            variable Expressions.
+            </summary>
+            
+            <param name="expr">Expression that may contain array access Expressions.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Pair as described.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.IsPointerExpression(Utilities.Expression)">
+            <summary>
+            Determines if the input Expression is a pointer Expression,
+            or if it refers to an array.
+            </summary>
+            
+            <param name="expr">Expression that may be a pointer Expression,
+            or that may refer to an array.</param>
+            <returns>True if the input Expression is a pointer Expression,
+            or if it refers to an array; false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.IsPointerExpressionType(Phx.Types.Type)">
+            <summary>
+            Determines if the input Expression type is a pointer type,
+            or if the corresponding Expression refers to an array.
+            </summary>
+            
+            <param name="exprType">Expression type that may be a pointer type,
+            or whose corresponding Expression may refer to an array.</param>
+            <returns>True if the input Expression type is a pointer type,
+            or if the corresponding Expression refers to an array; false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetPointerReferentType(Utilities.Expression)">
+            <summary>
+            Returns the type of the referent that the input pointer Expression refers to.
+            </summary>
+            
+            <param name="expr">Pointer Expression.</param>
+            <returns>Type of the referent that the input pointer Expression refers to.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetPointerReferentType(Phx.Types.Type)">
+            <summary>
+            Returns the type of the referent that the input pointer Expression type refers to.
+            </summary>
+            
+            <param name="exprType">Pointer Expression type.</param>
+            <returns>Type of the referent that the input pointer Expression refers to.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.AreSameTypes(Phx.Types.Type,Phx.Types.Type)">
+            <summary>
+            Returns true if, and only if, the two input Expression types are the same.
+            </summary>
+            
+            <param name="oneType">One Expression type.</param>
+            <param name="otherType">Another Expression type.</param>
+            <returns>True if, and only if, the two input Expression types are the same.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.MakeDereferencingFunction(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Creates a function Expression that takes two arguments and that, when applied,
+            dereferences the input pointer Expression with the first argument as the index
+            and the second argument as a bit offset from this dereference.
+            
+            For the purposes of GameTime, this function Expression is equivalent to the pointer
+            Expression itself.
+            </summary>
+            
+            <param name="pointerExpr">Pointer Expression.</param>
+            <param name="path">Path that contains the input pointer Expression.</param>
+            <returns>Function Expression as described.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.AddOffsetToPointer(Utilities.Expression,Utilities.Expression,GameTime.Path)">
+            <summary>
+            Offsets the input pointer Expression by the amount specified in the input bit offset
+            Expression. The input pointer Expression is a "dereferencing function", and
+            this method modifies the index and the offset of the dereference Expression in
+            the body of the function to include the new offset. This process helps to account
+            for pointer aliasing.
+            </summary>
+            
+            <param name="pointerExpr">Pointer Expression to offset.</param>
+            <param name="offsetExpr">Expression that specifies the amount to offset the input
+            Pointer Expression by, in bits.</param>
+            <param name="path">Path that contains the input pointer Expression.</param>
+            <returns>New Expression that offsets the input pointer Expression by the amount
+            specified in the input bit offset Expression. The original Expression is
+            not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.DereferencePointer(Utilities.Expression,Phx.Types.Type,System.Boolean,GameTime.Path)">
+            <summary>
+            Returns a new Expression that results from dereferencing the input pointer Expression.
+            </summary>
+            
+            <param name="pointerExpr">Pointer Expression.</param>
+            <param name="derefType">Type of the result.</param>
+            <param name="derefAggAccesses">True if the dereference should return accesses to
+            fields inside aggregates; false if only the aggregate itself should
+            be returned.</param>
+            <param name="path">Path that contains the input pointer Expression.</param>
+            <returns>New Expression that results from dereferencing the input
+            pointer Expression. The original Expression is not modified.</returns>
+            <remarks>Precondition: The Expression should refer to a memory location.</remarks>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.LookupAndReplaceOffset(Utilities.Expression,Phx.Types.Type,System.Boolean,GameTime.Path)">
+            <summary>
+            Replaces each offset Expression in the input Expression with the memory location that
+            it refers to, which could either be a variable, an array access or an aggregate access.
+            
+            Offsets within a function Expression are not touched, since complete information is
+            not yet available to determine the memory location: for example, the offset could
+            be one of the arguments to the function Expression.
+            </summary>
+            
+            <param name="expr">Expression that may contain offset Expressions.</param>
+            <param name="derefType">Type of the result.</param>
+            <param name="derefAggAccesses">True if the offset replacement should return accesses
+            to fields inside aggregates; false if only the aggregate itself should
+            be returned.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>New Expression that results from replacing each offset Expression in
+            the input Expression with the memory location that it refers to, which could
+            either be a variable, an array access or an aggregate access. The original Expression
+            is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.IsAggregateExpression(Utilities.Expression)">
+            <summary>
+            Determines if the input Expression is an aggregate Expression:
+            an Expression that represents an aggregate (a struct or a union).
+            </summary>
+            
+            <param name="expr">Expression that may be an aggregate Expression.</param>
+            <returns>True, if the input Expression is an aggregate Expression;
+            false, otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.IsAggregateExpressionType(Phx.Types.Type)">
+            <summary>
+            Determines if the input Expression type is an aggregate type:
+            a type that represents an aggregate (a struct or a union).
+            </summary>
+            
+            <param name="exprType">Expression type that may be an aggregate type.</param>
+            <returns>True if the input Expression type is an aggregate type:
+            a type that represents an aggregate (a struct or a union);
+            false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.MakeAggregateAccess(Utilities.Expression,Utilities.Expression,Phx.Types.Type,GameTime.Path)">
+            <summary>
+            Returns the Expression that corresponds to the input aggregate access. Note that
+            the aggregate access is converted into an access into an array. For example,
+            the aggregate access "a.b" is converted into the Expression "b[a]" (annotated
+            uniquely to distinguish it from other arrays that may have the name "b").
+            This conversion has the following semantics: "b" is an array of all of the "b"
+            fields in aggregates that have the same type as that of "a", and "b[a]" is
+            the particular value of the "b" field located in the aggregate "a".
+            </summary>
+            
+            <param name="aggregateExpr">Expression for the aggregate that
+            is being accessed.</param>
+            <param name="bitOffsetExpr">Bit offset of the field from the start of
+            the aggregate.</param>
+            <param name="accessType">Type of the accessed field.</param>
+            <param name="path">Path that contains the operands.</param>
+            <returns>Expression for the input aggregate access.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.MakeAggregateFieldFunction(Utilities.Expression,System.Int32,Phx.Types.Type,GameTime.Path)">
+            <summary>
+            Recursive helper method for the method <see cref="M:GameTime.ExpressionHelper.MakeAggregateAccess(Utilities.Expression,Utilities.Expression,Phx.Types.Type,GameTime.Path)"/>.
+            This method constructs a function Expression that, when called with
+            the appropriate arguments, returns accesses to different fields within
+            the input aggregate. The fields that are included in the function Expression
+            are those that overlap with a field that is being accessed, whose bit offset
+            (from the start of the aggregate) and type are provided.
+            
+            Since this method is only used in <see cref="M:GameTime.ExpressionHelper.MakeAggregateAccess(Utilities.Expression,Utilities.Expression,Phx.Types.Type,GameTime.Path)"/> if
+            the field is a fixed-size array, the type provided should be that of
+            a fixed-size array.
+            </summary>
+            
+            <param name="aggregateExpr">Expression for the aggregate that is
+            being accessed.</param>
+            <param name="bitOffset">Bit offset of the field from the start of
+            the aggregate.</param>
+            <param name="accessType">Type of the accessed field. Note that this
+            field may not be a member of the aggregate provided, but possibly a member of
+            an aliasing aggregate.</param>
+            <param name="path">Path that contains the aggregate Expression.</param>
+            <returns>Function Expression, as described above.</returns>
+            <remarks>Type of the accessed field is that of a fixed-size array.</remarks>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.IsFunctionExpression(Utilities.Expression)">
+            <summary>
+            Determines if the input Expression represents a function.
+            </summary>
+            
+            <param name="expr">Expression that may represent a function.</param>
+            <returns>True if the Expression represents a function; false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ApplyFunction(Utilities.Expression,System.Collections.Generic.List{Utilities.Expression},GameTime.Path)">
+            <summary>
+            Returns a new Expression that represents the result of applying the function
+            Expression provided on the list of argument Expressions provided.
+            </summary>
+            
+            <param name="funcExpr">Function Expression to apply.</param>
+            <param name="argExprs">List of Argument Expressions to apply the function on.</param>
+            <param name="path">Path that contains the input Expressions.</param>
+            <returns>New Expression that results from applying the function Expression
+            provided on the argument Expressions provided.</returns>
+            <remarks>Precondition: The input Expression is a function Expression.</remarks>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ConvertToBits(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Converts the input Expression, which represents a number of bytes,
+            into another Expression that represents the equivalent number of bits.
+            </summary>
+            
+            <param name="expr">Expression to convert, which represents a number of bytes.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Expression that represents the equivalent number of bits.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ConvertToBytes(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Converts the input Expression, which represents a number of bits,
+            into another Expression that represents the equivalent number of
+            bytes, rounded down.
+            </summary>
+            
+            <param name="expr">Expression to convert, which represents a number of bits.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Expression that represents the equivalent number of bytes,
+            rounded down.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.AdjustBitSize(Utilities.Expression,System.UInt32,System.Boolean,GameTime.Path)">
+            <summary>
+            Adjusts the bit-size of the input Expression to match the input target bit-size.
+            This adjustment involves either sign-extension or bit-extraction.
+            </summary>
+            
+            <param name="expr">Expression to adjust.</param>
+            <param name="targetBitSize">Target bit-size for the input Expression.</param>
+            <param name="zeroExtend">True if the input Expression should be zero-extended if smaller
+            than the input target bit-size; false otherwise.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>New Expression that adjusts the bit-size of the input Expression to match
+            the input target bit-size.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ExtractBits(Utilities.Expression,System.UInt32,System.UInt32,GameTime.Path)">
+            <summary>
+            Returns a new Expression that extracts a contiguous range of bits from
+            the input Expression.
+            </summary>
+            
+            <param name="expr">Expression to extract from.</param>
+            <param name="start">Start index of the contiguous range.</param>
+            <param name="end">End index of the contiguous range.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>New Expression that extracts a contiguous range of bits from
+            the input Expression.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.PadWithZeros(Utilities.Expression,System.UInt32,System.UInt32,GameTime.Path)">
+            <summary>
+            Returns a new Expression that pads the input Expression with zeros.
+            </summary>
+            
+            <param name="expr">Expression to pad.</param>
+            <param name="leftPadSize">Number of zeros to pad to the left of the Expression
+            (beyond the most significant bit).</param>
+            <param name="rightPadSize">Number of zeros to pad to the right of the Expression
+            (beyond the least significant bit).</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>New Expression that pads the input Expression with zeros.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.IsConstantExpression(Utilities.Expression)">
+            <summary>
+            Determines if the input Expression is a constant Expression.
+            </summary>
+            
+            <param name="expr">Expression that may be a constant Expression.</param>
+            <returns>True if the input Expression is a constant Expression;
+            false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.ConvertToConstant(Utilities.Expression)">
+            <summary>
+            Converts a constant Expression to the integer constant that it represents.
+            </summary>
+            
+            <param name="constantExpr">Constant Expression to convert.</param>
+            <returns>Integer constant that the input constant Expression represents.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input Expression as much as possible. This method does not perform
+            exhaustive simplification: it is meant to simplify commonly occurring types
+            of Expressions.
+            </summary>
+            
+            <param name="expr">Expression to simplify.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Simplified (as much as possible) version of the input Expression.
+            The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyAdditionExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input addition Expression as much as possible. This method does not
+            perform exhaustive simplification: it is meant to simplify commonly occurring types
+            of addition Expressions.
+            </summary>
+            
+            <param name="expr">Addition Expression to simplify.</param>
+            <param name="path">Path that contains the input addition Expression.</param>
+            <returns>Simplified (as much as possible) version of the input addition Expression.
+            The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifySubtractionExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input subtraction Expression as much as possible. This method does not
+            perform exhaustive simplification: it is meant to simplify commonly occurring types
+            of subtraction Expressions.
+            </summary>
+            
+            <param name="expr">Subtraction Expression to simplify.</param>
+            <param name="path">Path that contains the input subtraction Expression.</param>
+            <returns>Simplified (as much as possible) version of the input subtraction Expression.
+            The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyMultiplicationExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input multiplication Expression as much as possible. This method
+            does not perform exhaustive simplification: it is meant to simplify commonly
+            occurring types of multiplication Expressions.
+            </summary>
+            
+            <param name="expr">Multiplication Expression to simplify.</param>
+            <param name="path">Path that contains the input multiplication Expression.</param>
+            <returns>Simplified (as much as possible) version of the input multiplication
+            Expression. The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyDivisionExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input division Expression as much as possible. This method
+            does not perform exhaustive simplification: it is meant to simplify commonly
+            occurring types of division Expressions.
+            </summary>
+            
+            <param name="expr">Division Expression to simplify.</param>
+            <param name="path">Path that contains the input division Expression.</param>
+            <returns>Simplified (as much as possible) version of the input division
+            Expression. The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyRemainderExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input remainder Expression as much as possible. This method
+            does not perform exhaustive simplification: it is meant to simplify commonly
+            occurring types of remainder Expressions.
+            </summary>
+            
+            <param name="expr">Remainder Expression to simplify.</param>
+            <param name="path">Path that contains the input remainder Expression.</param>
+            <returns>Simplified (as much as possible) version of the input remainder
+            Expression. The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyEqualityExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input equality Expression as much as possible. This method
+            does not perform exhaustive simplification: it is meant to simplify commonly
+            occurring types of equality Expressions.
+            </summary>
+            
+            <param name="expr">Equality Expression to simplify.</param>
+            <param name="path">Path that contains the input equality Expression.</param>
+            <returns>Simplified (as much as possible) version of the input equality
+            Expression. The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.SimplifyIteExpression(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Simplifies the input if-then-else Expression as much as possible. This method
+            does not perform exhaustive simplification: it is meant to simplify commonly
+            occurring types of if-then-else Expressions.
+            </summary>
+            
+            <param name="expr">If-then-else Expression to simplify.</param>
+            <param name="path">Path that contains the input if-then-else Expression.</param>
+            <returns>Simplified (as much as possible) version of the input if-then-else
+            Expression. The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.UpdateExpression(Utilities.Expression,GameTime.BasicBlockAddendum,System.Boolean,GameTime.Path)">
+            <summary>
+            Updates the sub-Expressions in the input Expression to account for the assignments
+            to variables made in the corresponding basic block. The input Expression is present
+            along the input path.
+            </summary>
+            
+            <param name="expr">Expression to update.</param>
+            <param name="basicBlockAddendum">BasicBlockAddendum that contains
+            the Expression.</param>
+            <param name="updateIndices">True if only the indices in an array access Expression
+            need to be updated; false otherwise.</param>
+            <param name="path">Path along which the input Expression is present.</param>
+            <returns>New Expression that accounts for assignments made to variables in
+            the original Expression. The original Expression is not modified.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GetAugendAndAddend(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Returns a pair whose elements are (in order) the augend Expression and the addend
+            Expression of an addition Expression that evaluates to the input Expression.
+            </summary>
+            
+            <param name="expr">Expression that is the (possibly simplified) sum of the augend
+            and the addend Expressions that this method will return.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Pair of Expressions as described.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.FindNotEqualToZero(Utilities.Expression)">
+            <summary>
+            Returns a list of all the sub-Expressions in the input Expression that must not
+            be zero. This includes divisors of division Expressions and moduli of remainder
+            Expressions.
+            </summary>
+            
+            <param name="expr">Expression to search.</param>
+            <returns>List of Expressions that must not be zero.</returns>
+        </member>
+        <member name="M:GameTime.ExpressionHelper.GenerateNotEqualToZeroConditions(Utilities.Expression)">
+            <summary>
+            Generates a list of condition Expressions using the input Expression to ensure
+            that the divisor of a division Expression, or that the modulus of a remainder
+            Expression, is not set to zero by the SMT solver.
+            </summary>
+            
+            <param name="expr">Expression to augment.</param>
+            <returns>List of conditions that state that certain Expressions should not be
+            equal to zero.</returns>
+        </member>
+        <member name="T:GameTime.SmtHelper">
+            <summary>
+            This class defines various helper functions to interact with SMT solvers.
+            </summary>
+        </member>
+        <member name="F:GameTime.SmtHelper.comparisonOpTypes">
+            <summary>
+            Array of operator types that correspond to comparison operators.
+            </summary>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeConstantBv(System.String,System.UInt32)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that corresponds to the input constant.
+            </summary>
+            
+            <param name="value">String that represents a constant integer value.</param>
+            <param name="bitSize">Bit-size of the resulting bitvector.</param>
+            <returns>SMT-LIB v2.0-compliant string that corresponds to
+            the input constant.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeVariableBv(System.String,System.UInt32)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that declares
+            the input variable name as a bitvector.
+            </summary>
+            
+            <param name="name">Name of the input variable.</param>
+            <param name="bitSize">Bit-size of the resulting bitvector.</param>
+            <returns>SMT-LIB v2.0-compliant string that declares
+            the input variable as a bitvector.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeBvSort(System.UInt32)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that corresponds
+            to the sort of a bitvector with the input bit-size.
+            </summary>
+            
+            <param name="bitSize">Bit-size of a bitvector.</param>
+            <returns>SMT-LIB v2.0-compliant string that corresponds
+            to the sort of a bitvector with the input bit-size.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeBvSort(System.Int64)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that corresponds
+            to the sort of a bitvector with the input bit-size.
+            </summary>
+            
+            <param name="bitSize">Bit-size of a bitvector.</param>
+            <returns>SMT-LIB v2.0-compliant string that corresponds
+            to the sort of a bitvector with the input bit-size.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeArrayVarBv(System.String,System.Collections.Generic.List{System.UInt32},GameTime.Path)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that declares the input array variable name
+            as an array of bitvectors with bitvector indices.
+            </summary>
+            
+            <param name="name">Array variable name.</param>
+            <param name="dimensions">Dimensions of the array with the input name.</param>
+            <param name="path">Path that contains the array with the input name.</param>
+            <returns>SMT-LIB v2.0-compliant string that declares the input array variable name
+            as an array of bitvectors with bitvector indices.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeArraySort(System.Collections.Generic.List{System.UInt32},GameTime.Path)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that corresponds to the sort of an array of
+            bitvectors with bitvector indices, having the input dimensions.
+            </summary>
+            
+            <param name="dimensions">Dimensions of an array of bitvectors with
+            bitvector indices.</param>
+            <param name="path">Path that contains the input array
+            whose dimensions are provided.</param>
+            <returns>SMT-LIB v2.0-compliant string that corresponds to the sort of an array of
+            bitvectors with bitvector indices, having the input dimensions.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.MakeBooleanExpr(Utilities.Expression)">
+            <summary>
+            Returns a SMT-LIB v2.0-compliant string that corresponds to
+            the input Boolean Expression.
+            </summary>
+            
+            <param name="expr">Boolean Expression.</param>
+            <returns>SMT-LIB v2.0-compliant string that corresponds to
+            the input Boolean Expression.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.BooleanToIte(System.String,GameTime.SmtHelper.ExpressionType,System.UInt32)">
+            <summary>
+            Converts a Boolean Expression into a logically equivalent ITE statement that returns
+            a bitvector instead. If the Expression is not Boolean, it is returned unchanged.
+            </summary>
+            
+            <param name="exprString">SMT-LIB v2.0-compliant string that represents
+            the Expression to convert.</param>
+            <param name="exprType">Type of the Expression.</param>
+            <param name="bitSize">Bit-size of the resulting bitvector.</param>
+            <returns>Logically equivalent ITE statement if the Expression is Boolean;
+            unchanged input Expression otherwise.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.GetFunctionForUnary(Utilities.OperatorType)">
+            <summary>
+            Returns the string representation of the function appropriate for the input
+            operator type. The corresponding operator takes only one argument.
+            </summary>
+            
+            <param name="opType">Operator type.</param>
+            <returns>String representation of the function appropriate for the input operator type.
+            The corresponding operator takes only one argument.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.GetFunctionForBinary(Utilities.OperatorType)">
+            <summary>
+            Returns the string representation of the function appropriate for the input
+            operator type. The corresponding operator takes two arguments.
+            </summary>
+            
+            <param name="opType">Operator type.</param>
+            <returns>String representation of the function appropriate for the input operator type.
+            The corresponding operator takes two arguments.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.IsComparisonOp(Utilities.OperatorType)">
+            <summary>
+            Returns true if the input operator type corresponds to a comparison operator.
+            </summary>
+            
+            <param name="opType">Operator type.</param>
+            <returns>True if the input operator type corresponds to a comparison operator;
+            false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.GetFunctionForTernary(Utilities.OperatorType)">
+            <summary>
+            Returns the string representation of the function appropriate for the input
+            operator type. The corresponding operator takes three arguments.
+            </summary>
+            
+            <param name="opType">Operator type.</param>
+            <returns>String representation of the function appropriate for the input operator type.
+            The corresponding operator takes three arguments.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.ConvertToSmtLib2(Utilities.Expression)">
+            <summary>
+            Returns a pair whose first element is a string that complies with the SMT-LIB v2.0
+            standard and that corresponds to the input Expression, and whose second element
+            is the type of the Expression.
+            </summary>
+            
+            <param name="expr">Expression to convert.</param>
+            <returns>Pair whose first element is a string that complies with the SMT-LIB v2.0
+            standard and that corresponds to the input Expression, and whose second element
+            is the type of the Expression.</returns>
+        </member>
+        <member name="M:GameTime.SmtHelper.ConvertToSmtLib2Query(GameTime.Path)">
+            <summary>
+            Returns a string that complies with the SMT-LIB v2.0 standard and that corresponds
+            to a query that checks the feasibility of the conditions along the input Path.
+            </summary>
+            
+            <param name="path">Path to convert.</param>
+            <returns>String that complies with the SMT-LIB v2.0 standard and that corresponds to
+            a query that checks the feasibility of the conditions along the input Path.</returns>
+        </member>
+        <member name="T:GameTime.SmtHelper.ExpressionType">
+            <summary>
+            Possible types of an Expression. This is useful when we need to
+            "cast" an expression to the proper type.
+            </summary>
+        </member>
+        <member name="F:GameTime.SmtHelper.ExpressionType.DEFAULT">
+            <summary>
+            For non-Boolean Expressions.
+            </summary>
+        </member>
+        <member name="F:GameTime.SmtHelper.ExpressionType.BOOLEAN">
+            <summary>
+            For Boolean Expressions.
+            </summary>
+        </member>
+        <member name="T:GameTime.GameTimePass">
+            <summary>
+            This class defines the GameTime analysis pass.
+            </summary>
+        </member>
+        <member name="F:GameTime.GameTimePass.gameTimeControl">
+            <summary>
+            The GameTime component control.
+            </summary>
+        </member>
+        <member name="F:GameTime.GameTimePass.passName">
+            <summary>
+            Name that corresponds to the GameTime analysis pass.
+            </summary>
+        </member>
+        <member name="F:GameTime.GameTimePass.mode">
+            <summary>
+            Represents the current mode of GameTimeAnalysisPass.
+            </summary>
+        </member>
+        <member name="M:GameTime.GameTimePass.New(Phx.Passes.PassConfiguration)">
+            <summary>
+            New creates an instance of a pass. Following Phoenix guidelines, New is static.
+            </summary>
+            
+            <param name="config">Pointer to a Passes::PassConfiguration that provides
+            properties for retrieving the initial pass list.</param>
+            <returns>A pointer to the new pass.</returns>
+        </member>
+        <member name="M:GameTime.GameTimePass.Execute(Phx.ModuleUnit)">
+            <summary>
+            Execute is the pass's prime mover; all unit-centric processing occurs here. Note that
+            Execute might be thought of as a "callback": as the C2 host compiles each FunctionUnit,
+            passing it from pass to pass, the plug-in Execute method is called to do its work.
+            </summary>
+            
+            <param name="moduleUnit">The moduleUnit to process.</param>
+            <returns>True if successful; false otherwise.</returns>
+        </member>
+        <member name="M:GameTime.GameTimePass.ExecuteHelper(Phx.ModuleUnit)">
+            <summary>
+            Private helper workhorse function for <see cref="M:GameTime.GameTimePass.Execute(Phx.ModuleUnit)"/>.
+            </summary>
+            
+            <param name="moduleUnit">The moduleUnit to process.</param>
+            <returns>True if successful; false otherwise.</returns>
+        </member>
+        <member name="T:GameTime.GameTimePass.MODES">
+            <summary>
+            Enumeration that denotes the possible modes for GameTimeAnalysis pass.
+            </summary>
+        </member>
+        <member name="F:GameTime.GameTimePass.MODES.CREATE_DAG">
+            <summary>
+            Create the DAG that contains the basic blocks of a function unit.
+            </summary>
+        </member>
+        <member name="F:GameTime.GameTimePass.MODES.FIND_CONDITIONS">
+            <summary>
+            Find the conditions along a basis path.
+            </summary>
+        </member>
+        <member name="T:GameTime.GameTimePhase">
+            <summary>
+            This class defines the GameTime analysis phase.
+            </summary>
+        </member>
+        <member name="M:GameTime.GameTimePhase.New(Phx.Phases.PhaseConfiguration)">
+            <summary>
+            New creates an instance of a phase. Following Phoenix guidelines, New is static.
+            </summary>
+            
+            <param name="config">A pointer to a Phases.PhaseConfiguration that
+            provides properties for retrieving the initial phase list.</param>
+            <returns>A pointer to the new phase.</returns>
+        </member>
+        <member name="M:GameTime.GameTimePhase.Execute(Phx.Unit)">
+            <summary>
+            Execute is the phase's prime mover; all unit-centric processing occurs here. Note that
+            Execute might be thought of as a "callback": as the C2 host compiles each FunctionUnit,
+            passing it from phase to phase, the plug-in Execute method is called to do its work.
+            </summary>
+            
+            <remarks>Since the IR exists only at the FunctionUnit level, we ignore ModuleUnits.
+            The order of units in a compiland passed to Execute is indeterminate.</remarks>
+            
+            <param name="unit">The unit to process.</param>
+        </member>
+        <member name="T:GameTime.GameTimePlugin">
+            <summary>
+            This class defines the GameTime-specific plugin for the C2 backend.
+            </summary>
+        </member>
+        <member name="M:GameTime.GameTimePlugin.RegisterObjects">
+            <summary>
+            RegisterObjects initializes the plug-in's environment. Normally, this includes defining
+            your command-line switches (controls) that should be handled by Phoenix. Phoenix calls
+            this method early, upon loading the plug-in's DLL.
+            </summary>
+            
+            <remarks>
+            The RegisterObjects method is not the place to deal with phase-specific issues, because
+            the host has not yet built its phase list. However, controls ARE phase-specific.
+            Because the phase object does not exist yet, the phase's controls must be static
+            fields, accessible from here.
+            </remarks>
+        </member>
+        <member name="M:GameTime.GameTimePlugin.BuildPhases(Phx.Phases.PhaseConfiguration)">
+            <summary>
+            BuildPhases is where the plug-in creates and initializes its phase object(s), and
+            inserts them into the phase list already created by the c2 host.
+            </summary>
+            
+            <remarks>
+            This is where the plug-in determines a new phase's place in the list of C2 CodeGen
+            pass by locating an existing phase by name and inserting the new phase
+            before or after it.
+            </remarks>
+            
+            <param name="config">Pointer to a Phases.PhaseConfiguration of C2 CodeGen Pass.</param>
+        </member>
+        <member name="M:GameTime.GameTimePlugin.BuildPasses(Phx.Passes.PassConfiguration)">
+            <summary>
+            BuildPasses is where the plug-in creates and initializes its pass object(s), and
+            inserts them into the pass list already created by the c2 host.
+            </summary>
+        </member>
+        <member name="P:GameTime.GameTimePlugin.NameString">
+            <summary>
+            Returns the name of this plugin.
+            </summary>
+            
+            <returns>Name of this plugin.</returns>
+        </member>
+        <member name="T:GameTime.FunctionUnitHelper">
+            <summary>
+            This class defines various helper functions to interact with a Phoenix function unit.
+            </summary>
+        </member>
+        <member name="M:GameTime.FunctionUnitHelper.Preprocess(Phx.FunctionUnit)">
+            <summary>
+            Preprocesses the function unit provided.
+            </summary>
+            
+            <param name="functionUnit">Phoenix function unit to preprocess.</param>
+        </member>
+        <member name="M:GameTime.FunctionUnitHelper.GetFunctionName(Phx.FunctionUnit)">
+            <summary>
+            Returns the name of the function that corresponds to the function unit provided.
+            </summary>
+            
+            <param name="functionUnit">Phoenix function unit whose name is to be returned.</param>
+            <returns>Name of the Phoenix function unit.</returns>
+        </member>
+        <member name="M:GameTime.FunctionUnitHelper.DumpCfgToFile(Phx.FunctionUnit,System.UInt32,System.UInt32,Utilities.Configuration,Utilities.ProjectConfiguration)">
+            <summary>
+            Dumps the DOT representation of the control-flow graph of the input function unit
+            in a file (a DAG file labeled with the name of the function unit) that will be
+            further processed by the GameTime Python scripts.
+            </summary>
+            
+            <param name="functionUnit">Phoenix function unit whose control-flow graph is
+            to be dumped.</param>
+            <param name="sourceNodeId">ID of the BasicBlock in the control-flow
+            graph to start the analysis from.</param>
+            <param name="sinkNodeId">ID of the BasicBlock in the control-flow
+            graph to end the analysis at.</param>
+            <param name="config">Configuration object that contains
+            GameTime configuration information.</param>
+            <param name="projectConfig">ProjectConfiguration object that contains
+            project configuration information.</param>
+        </member>
+        <member name="M:GameTime.FunctionUnitHelper.FindPathConditions(Phx.FunctionUnit,Utilities.Configuration,Utilities.ProjectConfiguration)">
+            <summary>
+            Finds the conditions along a path.
+            </summary>
+            
+            <param name="functionUnit">Phoenix function unit.</param>
+            <param name="config">Configuration object that contains GameTime
+            configuration information.</param>
+            <param name="projectConfig">ProjectConfiguration object that
+            contains project configuration information.</param>
+        </member>
+        <member name="M:GameTime.FunctionUnitHelper.SplitAtUserLabel(Phx.FunctionUnit,System.String)">
+            <summary>
+            Splits the BasicBlock in <paramref name="functionUnit"/> that contains a user-defined
+            label with the name <paramref name="name"/>, and returns the new BasicBlock as a
+            result of the split.
+            </summary>
+            
+            <param name="functionUnit">Function unit that contains the label.</param>
+            <param name="name">Name of the user-defined label to find.</param>
+            <returns>New BasicBlock in <paramref name="functionUnit"/>
+            that results from a split at the user-defined label with the name
+            <paramref name="name"/>; null otherwise.</returns>
+            <remarks>Precondition: There is only one user-defined label with
+            the name <paramref name="name"/>.</remarks>
+        </member>
+        <member name="T:GameTime.PhoenixHelper">
+            <summary>
+            This class defines various helper functions to interact with the Phoenix infrastructure.
+            </summary>
+        </member>
+        <member name="M:GameTime.PhoenixHelper.GetOperandName(Phx.IR.Operand)">
+            <summary>
+            Returns the operand name at the source level.
+            </summary>
+            
+            <param name="operand">Operand whose name needs to be returned.</param>
+            <returns>Operand name at the source level.</returns>
+        </member>
+        <member name="M:GameTime.PhoenixHelper.MakeVariableExpression(Phx.IR.Operand,System.String,GameTime.Path)">
+            <summary>
+            Returns a variable Expression with the input value, which represents the variable
+            corresponding to the input operand.
+            </summary>
+            
+            <param name="operand">Operand for the variable Expression.</param>
+            <param name="value">Value of the variable Expression.</param>
+            <param name="path">Path that contains the operand.</param>
+            <returns>Variable Expression with value <paramref name="value"/>,
+            which represents the operand <paramref name="operand"/>.</returns>
+        </member>
+        <member name="M:GameTime.PhoenixHelper.MakeCallVariableExpression(Phx.IR.Operand,Phx.IR.Instruction,Phx.IR.Operand,GameTime.Path)">
+            <summary>
+            Creates a variable that corresponds to the input call instruction.
+            </summary>
+            
+            <param name="operand">Operand whose definition needs to be traced.</param>
+            <param name="callInstruction">Call instruction.</param>
+            <param name="varOperand">Current variable operand whose definition
+            is being traced, which may be different from "operand".</param>
+            <param name="path">Path along which to trace the definition.</param>
+            
+            <returns>Variable Expression corresponding to the call instruction provided.</returns>
+        </member>
+        <member name="M:GameTime.PhoenixHelper.GetAggregateName(Phx.Types.AggregateType)">
+            <summary>
+            Returns the "clean" string (without the extra characters added by Phoenix)
+            that represents the name of the aggregate.
+            </summary>
+            
+            <param name="aggregateType">Aggregate type.</param>
+            <returns>"Clean" string that represents the name of the aggregate type.</returns>
+        </member>
+        <member name="M:GameTime.PhoenixHelper.GetAggregateFields(Utilities.Expression,System.Int32,Phx.Types.Type,System.Boolean,GameTime.Path)">
+             <summary>
+             Returns a list of AggregateField objects, each of which represents
+             the aggregate fields that the input aggregate access overlaps.
+             </summary>
+            
+             <param name="aggregateExpr">Expression that represents the aggregate
+             that is being accessed.</param>
+             <param name="offset">Offset of the access from the start of the aggregate,
+             in bits.</param>
+             <param name="accessType">Type of the aggregate access.</param>
+             <param name="getArrayElements">True if, and only if, the elements of
+             a fixed-size array should be treated as separate fields of the aggregate.</param>
+             <param name="path">Path that contains the aggregate.</param>
+             <returns>List of AggregateField objects, each of which represents
+             the aggregate fields that the input aggregate access overlaps.</returns>
+        </member>
+        <member name="M:GameTime.PhoenixHelper.GetAggregateFieldsHelper(Phx.Types.AggregateType,System.Int32,Phx.Types.Type,System.Int32,System.Boolean,Utilities.Expression,GameTime.Path)">
+             <summary>
+             Recursive workhorse method for the method <see cref="M:GameTime.PhoenixHelper.GetAggregateFields(Utilities.Expression,System.Int32,Phx.Types.Type,System.Boolean,GameTime.Path)"/>.
+             </summary>
+            
+             <param name="aggregateType">Type of the aggregate that is being accessed.</param>
+             <param name="offset">Offset of the access from the start of the aggregate,
+             in bits.</param>
+             <param name="accessType">Type of the aggregate access.</param>
+             <param name="accessBitSize">Bit-size of the aggregate access.</param>
+             <param name="getArrayElements">True if, and only if, the elements of
+             a fixed-size array should be treated as separate fields of the aggregate.</param>
+             <param name="accessSoFar">Expression that represents the access so far.</param>
+             <param name="path">Path that contains the aggregate.</param>
+             <returns>List of AggregateField objects, each of which represents
+             the aggregate fields that the input aggregate access overlaps.</returns>
+        </member>
+        <member name="T:GameTime.BasicBlockAddendum">
+            <summary>
+            This class maintains additional information about a Phoenix basic block.
+            </summary>
+        </member>
+        <member name="F:GameTime.BasicBlockAddendum.varNumAssigns">
+            <summary>
+            Dictionary that maps a variable name to the number of assignments made to
+            that variable, if any assignments have been made.
+            </summary>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.#ctor">
+            <summary>
+            Constructor for the class.
+            </summary>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.GetOriginalVarName(System.String)">
+            <summary>
+            Returns the original variable name that corresponds to the input variable name.
+            The original name is the name without the annotation that denotes how many
+            assignments have been made to the variable.
+            </summary>
+            
+            <param name="variableName">Variable name.</param>
+            <returns>Original variable name that corresponds to the input variable name.</returns>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.GetVersion(System.String)">
+            <summary>
+            Returns the version of the input variable name, which is the annotation that
+            denotes how many assignments have been made to the variable. If there is
+            no such annotation, the method returns 0.
+            </summary>
+            
+            <param name="variableName">Variable name.</param>
+            <returns>Version of the input variable name.</returns>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.GetNumAssignments(Utilities.Expression)">
+            <summary>
+            Returns the number of assignments to a variable, as currently logged.
+            </summary>
+            
+            <param name="variableExpr">Expression that corresponds
+            to the variable to check.</param>
+            <returns>Number of assignments to the variable whose Expression is provided.</returns>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.IncrementNumAssignments(Utilities.Expression)">
+            <summary>
+            Logs a new assignment to a variable.
+            </summary>
+            
+            <param name="variableExpr">Expression that corresponds
+            to the variable to update.</param>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.GetOriginalVariable(Utilities.Expression)">
+            <summary>
+            Returns the original variable Expression for the input variable Expression.
+            The original variable Expression has the same name as the input variable, without
+            the annotation that denotes how many assignments have been made to the variable.
+            </summary>
+            
+            <param name="variableExpr">Variable Expression.</param>
+            <returns>Original variable Expression for the input variable Expression.</returns>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.GetUpdatedVersion(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Returns an updated version of the input variable Expression, based on
+            the number of assignments to the variable that have been logged.
+            </summary>
+            
+            <param name="variableExpr">Expression that corresponds
+            to the variable to update.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Updated Expression.</returns>
+        </member>
+        <member name="M:GameTime.BasicBlockAddendum.GetPreviousVersion(Utilities.Expression,GameTime.Path)">
+            <summary>
+            Returns the previous version of the input (updated) variable Expression.
+            </summary>
+            
+            <param name="variableExpr">Updated variable Expression.</param>
+            <param name="path">Path that contains the input Expression.</param>
+            <returns>Previous version of the updated variable Expression.</returns>
+        </member>
+        <member name="P:GameTime.BasicBlockAddendum.VarNumAssigns">
+            <summary>
+            Gets and sets the dictionary that maps a variable to the number of assignments
+            made to that variable, if any assignments have been made.
+            </summary>
+        </member>
+        <member name="T:GameTime.ExecutionHelper">
+            <summary>
+            This class defines various helper functions that allow the symbolic
+            execution of a path in the flow graph of a function unit.
+            </summary>
+        </member>
+        <member name="M:GameTime.ExecutionHelper.TraceOperandBackward(Phx.IR.Operand,Phx.IR.Operand,GameTime.Path)">
+            <summary>
+            Traces the definition of the input operand and returns its symbolic
+            Expression at the source level.
+            </summary>
+            
+            <param name="operand">Operand whose definition needs to be traced.</param>
+            <param name="varOperand">Current variable operand whose definition is being traced,
+            which may be different from <paramref name="operand"/>.</param>
+            <param name="path">Path along which to trace the definition.</param>
+            
+            <returns>Symbolic Expression that corresponds to the input operand.</returns>
+            <remarks>Precondition: <paramref name="operand"/> and <paramref name="varOperand"/>
+            are not null.</remarks>
+            <remarks>Postcondition: The resulting Expression is not null.</remarks>
+        </member>
+        <member name="M:GameTime.ExecutionHelper.TraceMemoryOperandBackward(Phx.IR.Operand,Phx.IR.Operand,GameTime.Path)">
+            <summary>
+            Traces the definition of the input memory operand (for a source-level dereference)
+            and returns its symbolic Expression at the source level.
+            </summary>
+            
+            <param name="memoryOperand">Memory operand whose definition needs to be traced.</param>
+            <param name="varOperand">Current variable operand whose definition is being traced,
+            which may be different from <paramref name="memoryOperand"/>.</param>
+            <param name="path">Path along which to trace the definition.</param>
+            
+            <returns>Symbolic Expression that corresponds to the input memory operand.</returns>
+            <remarks>Precondition: <paramref name="memoryOperand"/> and
+            <paramref name="varOperand"/> are not null.</remarks>
+            <remarks>Postcondition: The resulting Expression is not null.</remarks>
+        </member>
+        <member name="M:GameTime.ExecutionHelper.ExecuteValueInstructionBackward(Phx.IR.ValueInstruction,Phx.IR.Operand,System.Boolean,GameTime.Path)">
+            <summary>
+            Traces the definition of the operands occurring in the input value instruction
+            backward and returns the source-level symbolic Expression that corresponds
+            to the instruction.
+            </summary>
+            
+            <param name="valueInstruction">Value instruction.</param>
+            <param name="varOperand">Current variable operand whose definition
+            is being traced.</param>
+            <param name="completeTrace">True, if non-temporary variables should be traced
+            all the way back; false, otherwise. This flag is set to false when generating
+            conditions, but true when collecting assignments; in the former, we only need
+            the variable names being assigned to, whereas in the latter, we need the actual
+            assignment on the right-hand side traced back completely.</param>
+            <param name="path">Path along which to trace the definition.</param>
+            <returns>Symbolic Expression that corresponds to the input instruction.</returns>
+        </member>
+        <member name="M:GameTime.ExecutionHelper.ExecuteComparisonInstructionBackward(Phx.IR.CompareInstruction,Phx.IR.Operand,GameTime.Path)">
+            <summary>
+            Traces the definition of the operands occurring in the input comparison instruction
+            backward and returns the source-level symbolic Expression that corresponds
+            to the instruction.
+            </summary>
+            
+            <param name="compareInstruction">Comparison instruction.</param>
+            <param name="varOperand">Current variable operand whose definition
+            is being traced.</param>
+            <param name="path">Path along which to trace the definition.</param>
+            <returns>Symbolic Expression that corresponds to the input instruction.</returns>
+        </member>
+        <member name="M:GameTime.ExecutionHelper.ExecuteSpecialInstructionBackward(Phx.IR.Operand,Phx.IR.Instruction,Phx.IR.Operand,GameTime.Path)">
+            <summary>
+            Traces the definition of the operands occurring in the input special instruction
+            backward and returns the source-level symbolic Expression that corresponds
+            to the instruction.
+            </summary>
+            
+            <param name="operand">Operand whose definition needs to be traced.</param>
+            <param name="specialInstruction">Special instruction.</param>
+            <param name="varOperand">Current variable operand whose definition
+            is being traced.</param>
+            <param name="path">Path along which to trace the definition.</param>
+            
+            <returns>Symbolic Expression that corresponds to the input instruction.</returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,90 @@
+#!/usr/bin/env python
+
+"""Uses the `setuptools` module to install GameTime as a Python module."""
+
+"""See the LICENSE file, located in the root of the source distribution
+and at http://verifun.eecs.berkeley.edu/gametime/about/LICENSE, for
+details on the GameTime license and authors."""
+
+
+from ez_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup
+
+
+gametime_data = [
+    "config.xml",
+    "bin/*.dll",
+    "bin/analyze",
+    "bin/analyzeProject.py",
+    "bin/gametime-cli.bat",
+    "bin/gametime-gui.bat",
+    "bin/gui",
+    "bin/sampleProjectConfig.xml",
+    "gui/logo.png",
+]
+cil_data = [
+    "cil/LICENSE",
+    "cil/bin/cilly",
+    "cil/bin/cilly.bat",
+    "cil/bin/cilly.byte",
+    "cil/bin/cilly.native",
+    "cil/lib/perl5/patcher",
+    "cil/lib/perl5/App/Cilly.pm",
+    "cil/lib/perl5/App/Cilly/*.pm",
+    "ocaml/conf/findlib.conf",
+    "ocaml/lib/cil/*.cma",
+    "ocaml/lib/cil/*.cmxs",
+    "ocaml/lib/cil/META",
+    "ocaml/lib/loopHandler/loopHandler.cma",
+    "ocaml/lib/loopHandler/loopHandler.cmxs",
+    "ocaml/lib/loopHandler/META",
+]
+
+setup(
+    name="gametime",
+    version="1.5",
+    author=("Sanjit A. Seshia, Jonathan Kotker, Daniel Bundala, Andrew H. Chan, "
+            "James Ferguson, Jacob Levine, Sagar Jain, Min Xu, Lisa Yan"),
+    author_email="sseshia@eecs.berkeley.edu",
+    url="http://verifun.eecs.berkeley.edu/gametime",
+
+    # Provide a direct link to the pyparsing module.
+    dependency_links=[
+        ("http://sourceforge.net/projects/pyparsing/files/pyparsing/"
+         "pyparsing-1.5.7/pyparsing-1.5.7.tar.gz#egg=pyparsing-1.5.7"),
+    ],
+    install_requires=[
+        # "flask>=0.10",
+        "fabric>=1.8.0",
+        "networkx>=1.8.1",
+        "numpy>=1.7.1",
+        "ply>=3.4",
+        "pulp>=1.5.3",
+        "pyparsing>=1.5.7", # Later versions need Python 3.x.
+        "pyside>=1.1.2",
+        # "sphinx==1.1.3",
+    ],
+
+    packages=[
+        "gametime",
+        "gametime.cli",
+        "gametime.gui",
+        "gametime.simulators",
+        "gametime.smt",
+        "gametime.smt.parsers",
+        "gametime.smt.solvers",
+    ],
+    package_dir={"gametime": "src"},
+    package_data={"gametime": gametime_data + cil_data},
+
+    zip_safe=False,
+
+    entry_points = {
+        'console_scripts': [
+            'gametime-cli = gametime.cli:startCli',
+            'gametime-gui = gametime.gui:startGui',
+        ],
+    }
+)

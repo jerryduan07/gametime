@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<gametime-project>
+    <file>
+        <location>C:\cygwin64\home\elect\gametime-1.5\sandbox\speed\speed.c</location>
+        <analysis-function>calculate_final_speed</analysis-function>
+        <start-label></start-label>
+        <end-label></end-label>
+    </file>
+    <preprocess>
+        <include></include>
+        <merge></merge>
+        <inline></inline>
+    </preprocess>
+    <analysis>
+        <determinant-threshold>0.001</determinant-threshold>
+        <max-infeasible-paths>100</max-infeasible-paths>
+        <ilp-solver>glpk</ilp-solver>
+        <smt-solver>z3</smt-solver>
+    </analysis>
+    <debug/>
+</gametime-project>

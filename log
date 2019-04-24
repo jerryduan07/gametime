@@ -1,0 +1,38 @@
+Reading GameTime configuration in C:\Python27\lib\site-packages\gametime-1.5-py2.7.egg\gametime\config.xml...
+
+WARNING: Unable to find the Boolector executable. A GameTime project will not be able to use Boolector as its backend SMT solver.
+
+WARNING: Unable to find the location of the directory that contains the GNU ARM toolchain. A GameTime project will not be able to use the GNU ARM toolchain to measure the cycle counts of test cases.
+
+WARNING: Unable to find the location of the directory that contains the PTARM simulator. A GameTime project will not be able to use the PTARM simulator to measure the cycle counts of test cases.
+
+Successfully configured GameTime.
+
+Reading project configuration in C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\projectConfig.xml...
+Successfully loaded project.
+
+Preprocessing the file: running CIL to produce code simplified for analysis...
+
+C:\cygwin64\home\elect\gametime-1.5>perl /cygdrive/c/Python27/Lib/site-packages/gametime-1.5-py2.7.egg/gametime/cil/bin/cilly --dooneRet --domakeCFG --dosimpleMem --disallowDuplication --dopartial --partial_root_function=modexp_simple C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.c -I'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled' --save-temps='C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt' -c -o 'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.out' 
+
+C:\cygwin64\home\elect\gametime-1.5>perl /cygdrive/c/Python27/Lib/site-packages/gametime-1.5-py2.7.egg/gametime/cil/bin/cilly --dooneRet --domakeCFG --dosimpleMem --disallowDuplication --noPrintLn --dopartial --partial_root_function=modexp_simple C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.c -I'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled' --save-temps='C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt' -c -o 'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.out' 
+C:\Python27\lib\site-packages\gametime-1.5-py2.7.egg\gametime\cil\bin/cilly.bat --dooneRet --domakeCFG --dosimpleMem --disallowDuplication --dopartial --partial_root_function=modexp_simple C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.c -I'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled' --save-temps='C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt' -c -o 'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.out'
+C:\Python27\lib\site-packages\gametime-1.5-py2.7.egg\gametime\cil\bin/cilly.bat --dooneRet --domakeCFG --dosimpleMem --disallowDuplication --noPrintLn --dopartial --partial_root_function=modexp_simple C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.c -I'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled' --save-temps='C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt' -c -o 'C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\modexp_simple-gt.out'
+
+Final preprocessing phase complete.
+Preprocessing complete.
+
+Generating the DAG and associated information...
+modexp_simple-gt.c
+
+PHOENIX: Configuring this GameTime session with C:\Python27\lib\site-packages\gametime-1.5-py2.7.egg\gametime\config.xml...
+PHOENIX: Successfully configured this session.
+PHOENIX: Loading project configuration from C:\cygwin64\home\elect\gametime-1.5\sandbox\modexp_unrolled\modexp_simple-gt\project-config.xml...
+PHOENIX: Successfully loaded the project for this session.
+PHOENIX: GameTime operation mode is: Create DAG.
+PHOENIX: Preprocessing modexp_simple...
+
+PHOENIX: Finding the corresponding function unit...
+PHOENIX: Cannot find function named modexp_simple.
+PHOENIX: Exiting GameTime...
+Error running the Phoenix program analyzer.

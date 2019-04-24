@@ -1,0 +1,18 @@
+(define-fun __gtCONSTRAINT3 () Bool
+  true)
+(define-fun final_speed<2> () (_ BitVec 32)
+  #xffffff9c)
+(define-fun acc () (_ BitVec 16)
+  #x0028)
+(define-fun __gtCONSTRAINT1 () Bool
+  true)
+(define-fun __gtCONSTRAINT2 () Bool
+  true)
+(define-fun final_speed<1> () (_ BitVec 32)
+  #x800a8485)
+(define-fun __gtCONSTRAINT0 () Bool
+  true)
+(define-fun time () (_ BitVec 16)
+  #x4150)
+(define-fun initial_speed () (_ BitVec 32)
+  #x80005005)

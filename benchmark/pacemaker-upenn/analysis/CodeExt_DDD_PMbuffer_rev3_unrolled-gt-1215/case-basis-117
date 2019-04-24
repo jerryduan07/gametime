@@ -1,0 +1,13 @@
+_sfEvent_ = 0x5;
+rtDWork.bitsForTID0.is_Eng = 0x0;
+rtDWork.bitsForTID0.is_PAVI = 0x1;
+rtDWork.bitsForTID0.is_PURI = 0x2;
+rtDWork.bitsForTID0.is_PVRP = 0x2;
+rtDWork.bitsForTID0.is_active_Eng = 0x1;
+rtDWork.bitsForTID0.is_active_PAVI = 0x1;
+rtDWork.bitsForTID0.is_active_PLRI = 0x0;
+rtDWork.bitsForTID0.is_active_PPVARP = 0x0;
+rtDWork.bitsForTID0.is_active_PURI = 0x1;
+rtDWork.bitsForTID0.is_active_PVRP = 0x1;
+rtDWork.comm = 0x1;
+rtDWork.sent = 0x0;

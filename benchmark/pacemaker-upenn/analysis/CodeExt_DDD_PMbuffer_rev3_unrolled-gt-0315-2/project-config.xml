@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<gametime-project>
+    <file>
+        <location>C:\Research\GameTime-v1\benchmarks\pacemaker-upenn\CodeExt_DDD_PMbuffer_rev3_unrolled.c</location>
+        <analysis-function>c2_CodeExt_DDD_PMbuffer_rev3_1</analysis-function>
+        <start-label></start-label>
+        <end-label></end-label>
+    </file>
+    <preprocess>
+        <include></include>
+        <inline>broadcast_tt_1 broadcast_tt c2_CodeExt_DDD_PMbuffer_rev3</inline>
+    </preprocess>
+    <analysis>
+        <ilp-solver>glpk</ilp-solver>
+        <smt-solver>z3</smt-solver>
+    </analysis>
+    <debug>
+        <dump-ir/>
+        <dump-all-paths/>
+        <dump-all-queries/>
+    </debug>
+</gametime-project>

@@ -1,0 +1,6 @@
+package "loopHandler" (
+version = "1.0"
+description = "the loop handler, as part of the GameTime toolflow"
+archive(byte,plugin) = "loopHandler.cma"
+archive(native,plugin) = "loopHandler.cmxs"
+)

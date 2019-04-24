@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+
+<!-- This is the XML file that configures GameTime for a specific project. -->
+<gametime-project>
+    <!-- Information about the function to analyze. -->
+    <file>
+        <!-- Location of the file containing the function to analyze. -->
+        <location>CodeExt_DDD_PMbuffer_rev3_unrolled.c</location>
+        <!-- Function to analyze. -->
+        <!-- <analysis-function>Chart1</analysis-function> -->
+        <analysis-function>c2_CodeExt_DDD_PMbuffer_rev3_1</analysis-function>
+        <!-- Label in the function to start analysis from.
+             If left empty, GameTime will start analysis of the function
+             from its beginning. -->
+        <start-label></start-label>
+        <!-- Label in the function to end analysis at.
+             If left empty, GameTime will end analysis of the function
+             at its end. -->
+        <end-label></end-label>
+    </file>
+
+    <!-- Information to preprocess the file using source-to-source
+         transformations before analysis. -->
+    <preprocess>
+        <!-- Locations of other files to be included in the source file.
+             More than one file can be specified, and the names must be
+             separated by whitespaces. -->
+        <include></include>
+        <!-- Functions to inline, if any.  More than one function
+             can be specified, and the names must be separated
+             by whitespaces.  -->
+        <inline>broadcast_tt_1 broadcast_tt
+            c2_CodeExt_DDD_PMbuffer_rev3</inline>
+        <!-- Uncomment this tag to ask GameTime to detect loops. -->
+        <!-- <detect-loops/> -->
+        <!-- Uncomment this tag to ask GameTime to unroll loops. --> 
+        <!-- <unroll-loops/> -->
+    </preprocess>
+
+    <!-- Configuration options for various features of the analysis. -->
+    <analysis>
+        <!-- Uncomment this tag to randomize the basis that GameTime
+             starts the analysis with. Without randomization,
+             the initial basis is the standard basis. -->
+        <!-- <randomize-initial-basis/> -->
+        <!-- Uncomment this tag to treat floating point numbers as
+             integers that have the same bit representation. -->
+        <!-- <treat-float-as-int/> -->
+        <!-- Uncomment this tag to model multi-dimensional arrays
+             as nested arrays, or arrays whose elements can also
+             be arrays, in an SMT query. If commented out,
+             a multi-dimensional array will be modeled as
+             a one-dimensional array, and the indices
+             of an access will be concatenated. -->
+        <!-- <model-as-nested-arrays/> -->
+        <!-- Uncomment this tag to prevent the refinement of the basis
+             into a 2-barycentric spanner. -->
+        <!-- <prevent-basis-refinement/> -->
+        <!-- Integer linear programming solver used to solve integer linear
+             programs to generate candidate paths. The following options are
+             recognized: "cbc" for CBC; "cbc-pulp" for the version of CBC
+             provided with the PuLP package; "cplex" for CPLEX;
+             "glpk" for GLPK; "gurobi" for Gurobi; "xpress" for Xpress.
+             If no solver is specified, the default solver of the PuLP package
+             will be used. -->
+        <ilp-solver>glpk</ilp-solver>
+        <!-- SMT solver that GameTime uses to check the satisfiability
+             of an SMT query. The following options are recognized:
+             "boolector" (or "boolector-lingeling") for Boolector with
+             Lingeling as the SAT solver;
+             "boolector-minisat" for Boolector with MiniSAT as the SAT solver;
+             "boolector-picosat" for Boolector with PicoSAT as the SAT solver;
+             "z3" for Z3. -->
+        <smt-solver>z3</smt-solver>
+    </analysis>
+
+    <!-- Debugging options. -->
+    <debug>
+        <!-- Uncomment this tag to keep the temporary files that CIL
+             produces during its analysis. -->
+        <!-- <keep-cil-temps/> -->
+        <!-- Uncomment this tag to dump the Phoenix intermediate
+             representation of the function under analysis to a file. -->
+        <dump-ir/>
+        <!-- Uncomment this tag to keep debugging information and
+             files produced by the integer linear programming solver. -->
+        <!-- <keep-ilp-solver-output/> -->
+        <!-- Uncomment this tag to dump information about the path
+             being traced. -->
+        <!-- <dump-path/> -->
+        <!-- Uncomment this tag to dump information about all of the paths
+             that have been traced during analysis to a file. -->
+        <dump-all-paths/>
+        <!-- Uncomment this tag to dump information produced when
+             an IR-level instruction is traced backward. -->
+        <!-- <dump-instruction-trace/> -->
+        <!-- Uncomment this tag to dump information produced when
+             an SMT query is created. -->
+        <!-- <dump-smt-trace/> -->
+        <!-- Uncomment this tag to dump information about all of
+             the SMT queries that have been made during analysis
+             to a file. -->
+        <dump-all-queries/>
+        <!-- Uncomment this tag to keep debugging information and
+             files produced by the parser. -->
+        <!-- <keep-parser-output/> -->
+    </debug>
+</gametime-project>

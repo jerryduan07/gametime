@@ -1,0 +1,9 @@
+_sfEvent_ = 0x0;
+rtDWork.bitsForTID0.is_Eng = 0x1;
+rtDWork.bitsForTID0.is_PAVI = 0x1;
+rtDWork.bitsForTID0.is_PLRI = 0x0;
+rtDWork.bitsForTID0.is_PPVARP = 0x2;
+rtDWork.bitsForTID0.is_PURI = 0x0;
+rtDWork.bitsForTID0.is_PVRP = 0x1;
+rtDWork.comm = 0xffffffff;
+rtDWork.sent = 0xffffffff;

@@ -1,0 +1,11 @@
+--- phxvars32d.bat
++++ phxvars32d.bat
+@@ -24,6 +24,8 @@
+ 
+ :setVCVars
+ 
++@call "%VSINSTALLDIR%\Common7\Tools\vsvars32.bat"
++
+ @if NOT EXIST "%VCINSTALLDIR%\vcvarsall.bat" (
+    echo Warning! Visual C++ not installed or detected, C++ compilation will not be enabled.
+    echo If Visual C++ is installed, please reinstall or repair the Phoenix SDK to enable.

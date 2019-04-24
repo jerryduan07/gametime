@@ -1,0 +1,8 @@
+# These cycle counts were obtained on the PTARM Simulator v1.0, obtained from
+# http://chess.eecs.berkeley.edu/pret/src/ptarm-1.0/ptarm_simulator.html.
+# The basis paths were generated with Z3 v4.3.0 as the backend SMT solver and
+# the Gurobi Optimizer v5.1.0 as the backend integer linear programming solver.
+
+1   283
+2   299
+3   268

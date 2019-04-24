@@ -1,0 +1,7 @@
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\Utilities.dll
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\Utilities.pdb
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\phxd.dll
+C:\Research\GameTime-v1\src\phoenix\Utilities\bin\Debug\phxd.pdb
+C:\Research\GameTime-v1\src\phoenix\Utilities\obj\Debug\Utilities.dll
+C:\Research\GameTime-v1\src\phoenix\Utilities\obj\Debug\Utilities.pdb
+C:\Research\GameTime-v1\src\phoenix\Utilities\obj\Debug\Utilities.csprojResolveAssemblyReference.cache

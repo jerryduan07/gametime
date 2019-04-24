@@ -1,0 +1,4 @@
+[console_scripts]
+gametime-cli = gametime.cli:startCli
+gametime-gui = gametime.gui:startGui
+

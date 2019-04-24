@@ -1,0 +1,4 @@
+(final_speed<1> == (initial_speed + (signExtend(acc, 16) * signExtend(time, 16))))
+!(final_speed<1> > 100)
+(final_speed<1> < -100)
+(final_speed<2> == -100)

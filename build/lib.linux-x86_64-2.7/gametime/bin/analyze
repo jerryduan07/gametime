@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Determines the location of the sandbox script and runs
+# the sandbox script with the arguments provided at the command-line.
+
+# See the LICENSE file, located in the root directory of
+# the source distribution and
+# at http://verifun.eecs.berkeley.edu/gametime/about/LICENSE,
+# for details on the GameTime license and authors.
+
+
+# Guess where the analysis script might be.
+# There may be a copy in the `sandbox` directory.
+ANALYSIS_SCRIPT=`cygpath -m /mnt/c/Users/elect/OneDrive/Berkeley/2019Spring/EECS219C/Project/gametime-1.5/src/bin/../../sandbox/analyzeProject.py`
+if ! test -f $ANALYSIS_SCRIPT;
+# If it is not present in the `sandbox` directory,
+# use the copy provided in the installed Python package.
+then ANALYSIS_SCRIPT=`cygpath -m /gametime-1.0-py2.7.egg/gametime/bin/analyzeProject.py`;
+fi
+
+python $ANALYSIS_SCRIPT $@

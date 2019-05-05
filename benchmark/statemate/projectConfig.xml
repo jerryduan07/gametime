@@ -1,0 +1,126 @@
+<?xml version="1.0" ?>
+
+<!-- This is the XML file that configures GameTime for a specific project. -->
+<gametime-project>
+    <!-- Information about the function to analyze. -->
+    <file>
+        <!-- Location of the file containing the function to analyze.
+             This location can be either absolute or relative:
+             if relative, the location is resolved with respect to
+             the directory that contains this XML file. -->
+        <location>statemate_inlined.c</location>
+        <!-- Function to analyze. -->
+        <analysis-function>FH_DU</analysis-function>
+        <!-- Label in the function to start analysis from.
+             If left empty, GameTime will start analysis of the function
+             from its beginning. -->
+        <start-label></start-label>
+        <!-- Label in the function to end analysis at.
+             If left empty, GameTime will end analysis of the function
+             at its end. -->
+        <end-label></end-label>
+    </file>
+
+    <!-- Configuration options for preprocessing the file using
+         source-to-source transformations before analysis. -->
+    <preprocess>
+        <!-- Locations of directories that contain other files that need to be
+             compiled and linked, but not preprocessed, with the file
+             that contains the function to be analyzed, such as header files.
+             More than one directory can be specified, and the names must be
+             separated by either whitespaces or commas. The locations can be
+             either absolute or relative: if relative, a location is resolved
+             with respect to the directory that contains this XML file. -->
+        <include></include>
+        <!-- Locations of other files to be merged and preprocessed with
+             the file that contains the function to be analyzed. More than one
+             file can be specified, and the names must be separated by
+             either whitespaces or commas. Unix-style globs are also permitted.
+             The locations can be either absolute or relative: if relative,
+             a location is resolved with respect to the directory that contains
+             this XML file. -->
+        <merge></merge>
+        <!-- Functions to inline, if any. More than one function
+             can be specified, and the names must be separated
+             by whitespaces or commas. -->
+        <inline></inline>
+        <!-- Uncomment this tag to ask GameTime to unroll loops. -->
+        <!-- <unroll-loops/> -->
+    </preprocess>
+
+    <!-- Configuration options for various features of the analysis. -->
+    <analysis>
+        <maximum-error-scale-factor>5</maximum-error-scale-factor>
+        <!-- Uncomment this tag to randomize the basis that GameTime
+             starts the analysis with. Without randomization,
+             the initial basis is the standard basis. -->
+        <!-- <randomize-initial-basis/> -->
+        <!-- Threshold below which the determinant of the basis matrix
+             is considered "too small". -->
+        <determinant-threshold>0.001</determinant-threshold>
+        <!-- Maximum number of infeasible candidate paths that can be
+             explored before a row of a basis matrix is considered "bad". -->
+        <max-infeasible-paths>100</max-infeasible-paths>
+        <!-- Uncomment this tag to model multi-dimensional arrays
+             as nested arrays, or arrays whose elements can also
+             be arrays, in an SMT query. If commented out,
+             a multi-dimensional array will be modeled as
+             a one-dimensional array, and the indices
+             of an access will be concatenated. -->
+        <!-- <model-as-nested-arrays/> -->
+        <!-- Uncomment this tag to prevent the refinement of the basis
+             into a 2-barycentric spanner. -->
+        <!-- <prevent-basis-refinement/> -->
+        <!-- Integer linear programming solver used to solve integer linear
+             programs to generate candidate paths. The following options are
+             recognized: "cbc" for CBC; "cbc-pulp" for the version of CBC
+             provided with the PuLP package; "cplex" for CPLEX;
+             "glpk" for GLPK; "gurobi" for Gurobi; "xpress" for Xpress.
+             If no solver is specified, the default solver of the PuLP package
+             will be used. -->
+        <ilp-solver>glpk</ilp-solver>
+        <!-- SMT solver that GameTime uses to check the satisfiability
+             of an SMT query. The following options are recognized:
+             "boolector" (or "boolector-lingeling") for Boolector with
+             Lingeling as the SAT solver;
+             "boolector-minisat" for Boolector with MiniSat as the SAT solver;
+             "boolector-picosat" for Boolector with PicoSAT as the SAT solver;
+             "z3" for Z3. -->
+        <smt-solver>z3</smt-solver>
+    </analysis>
+
+    <!-- Debugging options. -->
+    <debug>
+        <!-- Uncomment this tag to keep the temporary files that CIL
+             produces during its analysis. -->
+        <!-- <keep-cil-temps/> -->
+        <!-- Uncomment this tag to dump the Phoenix intermediate
+             representation of the function under analysis to a file. -->
+        <!-- <dump-ir/> -->
+        <!-- Uncomment this tag to keep debugging information and
+             files produced by the integer linear programming solver. -->
+        <!-- <keep-ilp-solver-output/> -->
+        <!-- Uncomment this tag to dump information about the path
+             being traced. -->
+        <!-- <dump-path/> -->
+        <!-- Uncomment this tag to dump information about all of the paths
+             that have been traced during analysis to a file. -->
+        <!-- <dump-all-paths/> -->
+        <!-- Uncomment this tag to dump information produced when
+             an IR-level instruction is traced backward. -->
+        <!-- <dump-instruction-trace/> -->
+        <!-- Uncomment this tag to dump information produced when
+             an SMT query is created. -->
+        <!-- <dump-smt-trace/> -->
+        <!-- Uncomment this tag to dump information about all of
+             the SMT queries that have been made during analysis
+             to a file. -->
+        <!-- <dump-all-queries/> -->
+        <!-- Uncomment this tag to keep debugging information and
+             the temporary files produced by the parser. -->
+        <!-- <keep-parser-output/> -->
+        <!-- Uncomment this tag to keep the temporary files produced
+             by a simulator when measuring the value of a path. -->
+        <!-- <keep-simulator-output/> -->
+    </debug>
+</gametime-project>
